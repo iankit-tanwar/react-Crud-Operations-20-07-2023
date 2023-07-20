@@ -5,7 +5,15 @@ import './App.css';
 function Teacher() {
   //2.1 Hooks area
 
-  const[teacher, setTeachers] = useState([]);
+  const [teacher, setTeachers] = useState([]);
+
+  const [payload, setPayload] = useState({
+    "data": {
+      "name": "sushil"
+    }
+  });
+
+  const [teacherName, setTeacherName] = useState('');
 
   // useEffect is used for the page load
   useEffect(() => {
@@ -28,27 +36,66 @@ function Teacher() {
   //2.2 function defination area
 
 
+  let sendData = () => {
+    fetch(`http://localhost:1337/api/teachers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify(payload)
+    })
+      .then((res) => {
+        return res.json();
+
+      })
+      .then((data) => {
+        console.log(data);
+
+        if (data) {
+          alert('teacher created successfully')
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
+
+
+  let setValue = (e) => {
+    // console.log(document.getElementById("teacherName").value);
+    let val = document.getElementById("teacherName").value;
+    setTeacherName(val);
+
+    console.log('teachername', teacherName)
+
+    setPayload({
+      ...payload,
+      data: {
+        name: val
+      }
+    }
+    )
+
+  }
+
+
 
   //2.3 return area
 
   return (
     <>
+
       <div className="container">
+        <h1 className='text-center mt-3'>Create Teacher</h1>
         <form className='offset-3 w-50'>
           <div className="mb-3">
-            <label htmlFor="exampleInputEmail1" className="form-label">Email address</label>
-            <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
-            <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
+            <label htmlFor="teacherName" className="form-label">Teacher Name</label>
+            <input type="text" className="form-control" id="teacherName" aria-describedby="emailHelp" name='teacher' onKeyDown={(e) => { setValue(e) }} />
+
           </div>
-          <div className="mb-3">
-            <label htmlFor="exampleInputPassword1" className="form-label">Password</label>
-            <input type="password" className="form-control" id="exampleInputPassword1" />
-          </div>
-          <div className="mb-3 form-check">
-            <input type="checkbox" className="form-check-input" id="exampleCheck1" />
-            <label className="form-check-label" htmlFor="exampleCheck1">Check me out</label>
-          </div>
-          <button type="submit" className="btn btn-primary">Submit</button>
+
+          <button type="submit" className="btn btn-primary" onClick={() => { sendData() }}>Submit</button>
         </form>
         <br></br>
         <hr></hr>
@@ -65,9 +112,9 @@ function Teacher() {
           <tbody>
 
             {
-               teacher.length>0&& teacher.map((cv, idx, arr) => {
+              teacher.length > 0 && teacher.map((cv, idx, arr) => {
                 return <tr>
-                  <td  key={idx}>{cv.id}</td>
+                  <td key={idx}>{cv.id}</td>
                   <td>{cv.attributes.name}</td>
                   <td>{cv.attributes.createdAt}</td>
 
